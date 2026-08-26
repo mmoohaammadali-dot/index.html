@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Shorts AI Generator</title>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+    margin:0;
+    font-family:Arial,sans-serif;
+    background:#0b0b0f;
+    color:white;
+}
+
+.container{
+    max-width:900px;
+    margin:auto;
+    padding:25px 15px;
+}
+
+h1{
+    text-align:center;
+    font-size:32px;
+}
+
+.sub{
+    text-align:center;
+    color:#aaa;
+}
+
+.box{
+    background:#15151c;
+    border:1px solid #292934;
+    border-radius:18px;
+    padding:20px;
+    margin-top:25px;
+}
+
+input[type=file],input[type=text]{
+    width:100%;
+    padding:15px;
+    border-radius:10px;
+    border:1px solid #333;
+    background:#0e0e13;
+    color:white;
+    margin:10px 0;
+}
+
+button{
+    width:100%;
+    padding:15px;
+    border:0;
+    border-radius:10px;
+    background:#ff1744;
+    color:white;
+    font-size:16px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+button:hover{
+    opacity:.85;
+}
+
+#loading{
+    display:none;
+    text-align:center;
+    margin:20px;
+    color:#aaa;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+    gap:15px;
+    margin-top:20px;
+}
+
+.card{
+    background:#17171f;
+    border:1px solid #292934;
+    padding:16px;
+    border-radius:15px;
+}
+
+.number{
+    color:#ff1744;
+    font-weight:bold;
+}
+
+.caption{
+    font-size:17px;
+    line-height:1.4;
+}
+
+.tags{
+    color:#888;
+    font-size:13px;
+}
+
+.download{
+    background:#22222b;
+    margin-top:10px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>🔥 Shorts AI Generator</h1>
+
+<p class="sub">
+Generate 50+ Hinglish Shorts ideas & captions
+</p>
+
+<div class="box">
+
+<h3>🎥 Upload Your Video</h3>
+
+<input
+type="file"
+id="video"
+accept="video/*"
+>
+
+<input
+type="text"
+id="topic"
+placeholder="Video topic e.g. Ronaldo, Dhoni, Gaming..."
+>
+
+<button onclick="generateShorts()">
+🚀 Generate 50+ Shorts
+</button>
+
+<div id="loading">
+⏳ AI is finding the best Shorts ideas...
+</div>
+
+</div>
+
+<div id="results" class="grid"></div>
+
+</div>
+
+<script>
+
+const captions = [
+
+"Bro ye moment toh next level tha 🔥😳",
+"Ye dekh ke literally goosebumps aa gaye 🔥",
+"Wait for the ending 😳🔥",
+"Bhai yaha pura game change ho gaya 💀",
+"Is moment ko miss mat karna 👀",
+"Bro really said: I'm built different 🗿🔥",
+"Ye moment internet todne wala hai 🔥",
+"Legendary moment! 👑",
+"Yaha jo hua wo unexpected tha 😳",
+"Bro ne impossible ko possible kar diya 🔥",
+"Ye scene repeat pe dekhna padega 😂🔥",
+"Absolute cinema 🎬🔥",
+"Is bande ka confidence dekho 😮‍💨",
+"That's why he's different 👑",
+"Ending ne pura scene change kar diya 😳",
+"Bro was not ready for this 💀",
+"Pure domination 🔥",
+"Ye skill level alag hi hai 😳",
+"Nobody expected this moment!",
+"History was made today 👑",
+"Ye moment yaad rahega 🔥",
+"Bro went crazy 💀🔥",
+"Literally unbelievable 😳",
+"GOAT behaviour 🐐🔥",
+"Skill + confidence = 🔥",
+"Yaha toh sab shock ho gaye 😳",
+"One of the craziest moments 🔥",
+"Bro understood the assignment 😂",
+"Ye comeback insane tha 🔥",
+"Wait... WHAT?! 😳",
+"Legend never disappoints 👑",
+"Is level ka confidence chahiye 🔥",
+"Bro activated beast mode 💀",
+"Unreal performance 🔥",
+"Ye toh pure madness hai 😂",
+"Can you believe this? 😳",
+"Peak performance 👑",
+"That reaction 😂🔥",
+"Nobody saw this coming!",
+"Bro casually did this 💀",
+"Absolute masterpiece 🔥",
+"Ye moment viral hona chahiye!",
+"Insane timing 😳🔥",
+"Bro is different 🗿",
+"That was CLEAN 🔥",
+"Respect++ 👑",
+"Ye scene toh legendary hai!",
+"Crazy skill level 😳",
+"Straight out of a movie 🎬",
+"GOAT moment 🐐🔥",
+"Internet needs to see this 👀"
+];
+
+function generateShorts(){
+
+    const video =
+    document.getElementById("video").files[0];
+
+    const topic =
+    document.getElementById("topic").value ||
+    "This Video";
+
+    if(!video){
+        alert("Pehle apni video upload karo.");
+        return;
+    }
+
+    document.getElementById("loading").style.display="block";
+
+    setTimeout(()=>{
+
+        const results =
+        document.getElementById("results");
+
+        results.innerHTML="";
+
+        for(let i=0;i<50;i++){
+
+            const start =
+            formatTime(i * 20);
+
+            const end =
+            formatTime(i * 20 + 20);
+
+            const caption =
+            captions[i % captions.length];
+
+            results.innerHTML += `
+
+            <div class="card">
+
+                <div class="number">
+                    SHORT #${i+1}
+                </div>
+
+                <p>
+                    ⏱ ${start} → ${end}
+                </p>
+
+                <p class="caption">
+                    ${caption}
+                </p>
+
+                <p>
+                    🎯 ${topic}
+                </p>
+
+                <p class="tags">
+                    #shorts #viral #trending #${clean(topic)}
+                </p>
+
+                <button
+                class="download"
+                onclick="copyCaption(${i})">
+                📋 Copy Caption
+                </button>
+
+            </div>
+            `;
+        }
+
+        document.getElementById("loading").style.display="none";
+
+    },1200);
+}
+
+
+function formatTime(seconds){
+
+    const m =
+    Math.floor(seconds/60)
+    .toString()
+    .padStart(2,"0");
+
+    const s =
+    (seconds%60)
+    .toString()
+    .padStart(2,"0");
+
+    return `${m}:${s}`;
+}
+
+
+function clean(text){
+
+    return text
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g,"");
+}
+
+
+function copyCaption(index){
+
+    navigator.clipboard.writeText(
+        captions[index % captions.length]
+    );
+
+    alert("Caption copied! ✅");
+}
+
+</script>
+
+</body>
+</html>
