@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>ShortsAI - Free AI Shorts Maker</title>
+
+<style>
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+}
+
+body{
+  font-family:Arial, sans-serif;
+  background:#08080d;
+  color:white;
+}
+
+.container{
+  max-width:900px;
+  margin:auto;
+  padding:25px;
+}
+
+header{
+  text-align:center;
+  padding:35px 10px;
+}
+
+.logo{
+  font-size:42px;
+  font-weight:bold;
+}
+
+.gradient{
+  background:linear-gradient(90deg,#7c4dff,#00d4ff);
+  -webkit-background-clip:text;
+  color:transparent;
+}
+
+.subtitle{
+  color:#aaa;
+  margin-top:10px;
+}
+
+.card{
+  background:#14141c;
+  border:1px solid #292936;
+  border-radius:20px;
+  padding:22px;
+  margin:20px 0;
+}
+
+.card h2{
+  margin-bottom:18px;
+}
+
+.upload{
+  border:2px dashed #45455a;
+  border-radius:15px;
+  padding:30px;
+  text-align:center;
+  cursor:pointer;
+}
+
+.upload:hover{
+  border-color:#7c4dff;
+}
+
+input[type=file]{
+  width:100%;
+  margin-top:15px;
+}
+
+video{
+  width:100%;
+  max-height:500px;
+  background:black;
+  border-radius:15px;
+  margin-top:15px;
+}
+
+label{
+  display:block;
+  margin-top:15px;
+  margin-bottom:7px;
+  color:#ccc;
+}
+
+input[type=range]{
+  width:100%;
+}
+
+button{
+  border:none;
+  padding:14px 20px;
+  border-radius:12px;
+  background:#7157ff;
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+  margin-top:18px;
+}
+
+button:hover{
+  opacity:.85;
+}
+
+button:disabled{
+  opacity:.4;
+  cursor:not-allowed;
+}
+
+.download{
+  background:#00a86b;
+}
+
+.status{
+  margin-top:15px;
+  color:#72e7ff;
+}
+
+.info{
+  color:#999;
+  font-size:14px;
+  margin-top:10px;
+}
+
+.footer{
+  text-align:center;
+  color:#777;
+  padding:30px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<header>
+  <div class="logo">
+    ⚡ <span class="gradient">ShortsAI</span>
+  </div>
+
+  <p class="subtitle">
+    Free browser-based Shorts Maker
+  </p>
+</header>
+
+
+<!-- UPLOAD -->
+
+<div class="card">
+
+<h2>🎥 Upload Video</h2>
+
+<div class="upload">
+
+  <p>Select your long video</p>
+
+  <input
+    id="videoInput"
+    type="file"
+    accept="video/*"
+  >
+
+</div>
+
+<p id="fileInfo" class="info"></p>
+
+</div>
+
+
+<!-- EDIT -->
+
+<div class="card">
+
+<h2>✂️ Create Short</h2>
+
+<label>
+  Short Length:
+  <b><span id="lengthValue">30</span> seconds</b>
+</label>
+
+<input
+  id="length"
+  type="range"
+  min="10"
+  max="60"
+  value="30"
+>
+
+
+<label>
+  Start Time:
+  <b><span id="startValue">0</span> seconds</b>
+</label>
+
+<input
+  id="start"
+  type="range"
+  min="0"
+  max="0"
+  value="0"
+>
+
+<br>
+
+<button id="createBtn" disabled>
+  ✂️ Create Short
+</button>
+
+<p id="status" class="status"></p>
+
+</div>
+
+
+<!-- PREVIEW -->
+
+<div class="card">
+
+<h2>📱 Preview</h2>
+
+<video
+  id="preview"
+  controls
+  playsinline
+></video>
+
+<br>
+
+<button
+  id="downloadBtn"
+  class="download"
+  disabled
+>
+  ⬇️ Download Short
+</button>
+
+</div>
+
+
+<div class="footer">
+  ShortsAI • Free & Browser Based
+</div>
+
+</div>
+
+
+<script>
+
+const videoInput =
+document.getElementById("videoInput");
+
+const preview =
+document.getElementById("preview");
+
+const createBtn =
+document.getElementById("createBtn");
+
+const downloadBtn =
+document.getElementById("downloadBtn");
+
+const length =
+document.getElementById("length");
+
+const start =
+document.getElementById("start");
+
+const lengthValue =
+document.getElementById("lengthValue");
+
+const startValue =
+document.getElementById("startValue");
+
+const status =
+document.getElementById("status");
+
+const fileInfo =
+document.getElementById("fileInfo");
+
+let videoURL = null;
+let outputURL = null;
+let duration = 0;
+
+
+/* LENGTH */
+
+length.addEventListener("input", () => {
+
+  lengthValue.textContent =
+    length.value;
+
+  updateStart();
+
+});
+
+
+/* START */
+
+start.addEventListener("input", () => {
+
+  startValue.textContent =
+    start.value;
+
+});
+
+
+/* UPLOAD */
+
+videoInput.addEventListener("change", () => {
+
+  const file =
+    videoInput.files[0];
+
+  if(!file) return;
+
+  if(videoURL){
+    URL.revokeObjectURL(videoURL);
+  }
+
+  videoURL =
+    URL.createObjectURL(file);
+
+  preview.src = videoURL;
+
+  fileInfo.textContent =
+    file.name +
+    " • " +
+    (file.size / 1024 / 1024).toFixed(1) +
+    " MB";
+
+  createBtn.disabled = false;
+
+  preview.onloadedmetadata = () => {
+
+    duration =
+      preview.duration;
+
+    updateStart();
+
+  };
+
+});
+
+
+/* UPDATE START */
+
+function updateStart(){
+
+  if(!duration) return;
+
+  const max =
+    Math.max(
+      0,
+      Math.floor(
+        duration -
+        Number(length.value)
+      )
+    );
+
+  start.max = max;
+
+  if(Number(start.value) > max){
+    start.value = max;
+  }
+
+  startValue.textContent =
+    start.value;
+}
+
+
+/* CREATE SHORT */
+
+createBtn.addEventListener(
+"click",
+async () => {
+
+  if(!videoURL) return;
+
+  status.textContent =
+    "⏳ Creating your Short...";
+
+  createBtn.disabled = true;
+
+  try{
+
+    const video =
+      document.createElement("video");
+
+    video.src = videoURL;
+
+    video.muted = false;
+
+    video.playsInline = true;
+
+    await new Promise(resolve => {
+
+      video.onloadedmetadata =
+        resolve;
+
+    });
+
+    const startTime =
+      Number(start.value);
+
+    const clipLength =
+      Math.min(
+        Number(length.value),
+        duration - startTime
+      );
+
+
+    /*
+      Capture the video locally.
+      No server or paid API required.
+    */
+
+    video.currentTime =
+      startTime;
+
+    await video.play();
+
+    const stream =
+      video.captureStream();
+
+    const recorder =
+      new MediaRecorder(
+        stream,
+        {
+          mimeType:
+          "video/webm"
+        }
+      );
+
+    const chunks = [];
+
+
+    recorder.ondataavailable =
+      event => {
+
+        if(event.data.size){
+          chunks.push(
+            event.data
+          );
+        }
+
+      };
+
+
+    const finished =
+      new Promise(resolve => {
+
+        recorder.onstop =
+          resolve;
+
+      });
+
+
+    recorder.start();
+
+
+    setTimeout(() => {
+
+      video.pause();
+
+      recorder.stop();
+
+    }, clipLength * 1000);
+
+
+    await finished;
+
+
+    const blob =
+      new Blob(
+        chunks,
+        {
+          type:
+          "video/webm"
+        }
+      );
+
+
+    if(outputURL){
+      URL.revokeObjectURL(
+        outputURL
+      );
+    }
+
+    outputURL =
+      URL.createObjectURL(blob);
+
+    preview.src =
+      outputURL;
+
+    downloadBtn.disabled =
+      false;
+
+    status.textContent =
+      "✅ Short created successfully!";
+
+  }
+
+  catch(error){
+
+    console.error(error);
+
+    status.textContent =
+      "❌ Something went wrong.";
+
+  }
+
+  createBtn.disabled = false;
+
+});
+
+
+/* DOWNLOAD */
+
+downloadBtn.addEventListener(
+"click",
+() => {
+
+  if(!outputURL) return;
+
+  const link =
+    document.createElement("a");
+
+  link.href =
+    outputURL;
+
+  link.download =
+    "ShortsAI-Short.webm";
+
+  link.click();
+
+});
+
+
+</script>
+
+</body>
+</html>
